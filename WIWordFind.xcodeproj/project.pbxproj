@@ -14,13 +14,20 @@
 		D8FDAF18195A671C00748A76 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF17195A671C00748A76 /* main.m */; };
 		D8FDAF1C195A671C00748A76 /* MMAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF1B195A671C00748A76 /* MMAppDelegate.m */; };
 		D8FDAF1F195A671C00748A76 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8FDAF1D195A671C00748A76 /* Main.storyboard */; };
-		D8FDAF22195A671C00748A76 /* MMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF21195A671C00748A76 /* MMViewController.m */; };
+		D8FDAF22195A671C00748A76 /* MMMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF21195A671C00748A76 /* MMMenuViewController.m */; };
 		D8FDAF24195A671C00748A76 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8FDAF23195A671C00748A76 /* Images.xcassets */; };
 		D8FDAF2B195A671C00748A76 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF2A195A671C00748A76 /* XCTest.framework */; };
 		D8FDAF2C195A671C00748A76 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF0B195A671C00748A76 /* Foundation.framework */; };
 		D8FDAF2D195A671C00748A76 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF0F195A671C00748A76 /* UIKit.framework */; };
 		D8FDAF35195A671C00748A76 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D8FDAF33195A671C00748A76 /* InfoPlist.strings */; };
 		D8FDAF37195A671C00748A76 /* WIWordFindTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF36195A671C00748A76 /* WIWordFindTests.m */; };
+		D8FDAF44195A674E00748A76 /* MMLineDrawingView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF41195A674E00748A76 /* MMLineDrawingView.m */; };
+		D8FDAF45195A674E00748A76 /* MMWordFindViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF43195A674E00748A76 /* MMWordFindViewController.m */; };
+		D8FDAF48195BB43E00748A76 /* MMStripesBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF47195BB43E00748A76 /* MMStripesBackgroundView.m */; };
+		D8FDAF4A195C3E7100748A76 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF49195C3E7100748A76 /* iAd.framework */; };
+		D8FDAF51195C445300748A76 /* MMCoordinate.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF50195C445300748A76 /* MMCoordinate.m */; };
+		D8FDAF54195C449800748A76 /* MMPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF53195C449800748A76 /* MMPosition.m */; };
+		D8FDAF57195C44F800748A76 /* MMWordGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = D8FDAF56195C44F800748A76 /* MMWordGrid.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,14 +52,27 @@
 		D8FDAF1A195A671C00748A76 /* MMAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMAppDelegate.h; sourceTree = "<group>"; };
 		D8FDAF1B195A671C00748A76 /* MMAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMAppDelegate.m; sourceTree = "<group>"; };
 		D8FDAF1E195A671C00748A76 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D8FDAF20195A671C00748A76 /* MMViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMViewController.h; sourceTree = "<group>"; };
-		D8FDAF21195A671C00748A76 /* MMViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMViewController.m; sourceTree = "<group>"; };
+		D8FDAF20195A671C00748A76 /* MMMenuViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMMenuViewController.h; sourceTree = "<group>"; };
+		D8FDAF21195A671C00748A76 /* MMMenuViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMMenuViewController.m; sourceTree = "<group>"; };
 		D8FDAF23195A671C00748A76 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		D8FDAF29195A671C00748A76 /* WIWordFindTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WIWordFindTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8FDAF2A195A671C00748A76 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		D8FDAF32195A671C00748A76 /* WIWordFindTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "WIWordFindTests-Info.plist"; sourceTree = "<group>"; };
 		D8FDAF34195A671C00748A76 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D8FDAF36195A671C00748A76 /* WIWordFindTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WIWordFindTests.m; sourceTree = "<group>"; };
+		D8FDAF40195A674D00748A76 /* MMLineDrawingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMLineDrawingView.h; sourceTree = "<group>"; };
+		D8FDAF41195A674E00748A76 /* MMLineDrawingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMLineDrawingView.m; sourceTree = "<group>"; };
+		D8FDAF42195A674E00748A76 /* MMWordFindViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMWordFindViewController.h; sourceTree = "<group>"; };
+		D8FDAF43195A674E00748A76 /* MMWordFindViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMWordFindViewController.m; sourceTree = "<group>"; };
+		D8FDAF46195BB43E00748A76 /* MMStripesBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMStripesBackgroundView.h; sourceTree = "<group>"; };
+		D8FDAF47195BB43E00748A76 /* MMStripesBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMStripesBackgroundView.m; sourceTree = "<group>"; };
+		D8FDAF49195C3E7100748A76 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
+		D8FDAF4F195C445300748A76 /* MMCoordinate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMCoordinate.h; sourceTree = "<group>"; };
+		D8FDAF50195C445300748A76 /* MMCoordinate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMCoordinate.m; sourceTree = "<group>"; };
+		D8FDAF52195C449800748A76 /* MMPosition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPosition.h; sourceTree = "<group>"; };
+		D8FDAF53195C449800748A76 /* MMPosition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPosition.m; sourceTree = "<group>"; };
+		D8FDAF55195C44F800748A76 /* MMWordGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMWordGrid.h; sourceTree = "<group>"; };
+		D8FDAF56195C44F800748A76 /* MMWordGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMWordGrid.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8FDAF4A195C3E7100748A76 /* iAd.framework in Frameworks */,
 				D8FDAF0E195A671C00748A76 /* CoreGraphics.framework in Frameworks */,
 				D8FDAF10195A671C00748A76 /* UIKit.framework in Frameworks */,
 				D8FDAF0C195A671C00748A76 /* Foundation.framework in Frameworks */,
@@ -101,6 +122,7 @@
 		D8FDAF0A195A671C00748A76 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8FDAF49195C3E7100748A76 /* iAd.framework */,
 				D8FDAF0B195A671C00748A76 /* Foundation.framework */,
 				D8FDAF0D195A671C00748A76 /* CoreGraphics.framework */,
 				D8FDAF0F195A671C00748A76 /* UIKit.framework */,
@@ -112,11 +134,18 @@
 		D8FDAF11195A671C00748A76 /* WIWordFind */ = {
 			isa = PBXGroup;
 			children = (
+				D8FDAF4B195C444000748A76 /* WordFind */,
+				D8FDAF46195BB43E00748A76 /* MMStripesBackgroundView.h */,
+				D8FDAF47195BB43E00748A76 /* MMStripesBackgroundView.m */,
 				D8FDAF1A195A671C00748A76 /* MMAppDelegate.h */,
 				D8FDAF1B195A671C00748A76 /* MMAppDelegate.m */,
 				D8FDAF1D195A671C00748A76 /* Main.storyboard */,
-				D8FDAF20195A671C00748A76 /* MMViewController.h */,
-				D8FDAF21195A671C00748A76 /* MMViewController.m */,
+				D8FDAF40195A674D00748A76 /* MMLineDrawingView.h */,
+				D8FDAF41195A674E00748A76 /* MMLineDrawingView.m */,
+				D8FDAF42195A674E00748A76 /* MMWordFindViewController.h */,
+				D8FDAF43195A674E00748A76 /* MMWordFindViewController.m */,
+				D8FDAF20195A671C00748A76 /* MMMenuViewController.h */,
+				D8FDAF21195A671C00748A76 /* MMMenuViewController.m */,
 				D8FDAF23195A671C00748A76 /* Images.xcassets */,
 				D8FDAF12195A671C00748A76 /* Supporting Files */,
 			);
@@ -150,6 +179,43 @@
 				D8FDAF33195A671C00748A76 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D8FDAF4B195C444000748A76 /* WordFind */ = {
+			isa = PBXGroup;
+			children = (
+				D8FDAF4C195C444000748A76 /* MMCoordinate */,
+				D8FDAF4D195C444000748A76 /* MMPosition */,
+				D8FDAF4E195C444000748A76 /* MMWordGrid */,
+			);
+			path = WordFind;
+			sourceTree = "<group>";
+		};
+		D8FDAF4C195C444000748A76 /* MMCoordinate */ = {
+			isa = PBXGroup;
+			children = (
+				D8FDAF4F195C445300748A76 /* MMCoordinate.h */,
+				D8FDAF50195C445300748A76 /* MMCoordinate.m */,
+			);
+			path = MMCoordinate;
+			sourceTree = "<group>";
+		};
+		D8FDAF4D195C444000748A76 /* MMPosition */ = {
+			isa = PBXGroup;
+			children = (
+				D8FDAF52195C449800748A76 /* MMPosition.h */,
+				D8FDAF53195C449800748A76 /* MMPosition.m */,
+			);
+			path = MMPosition;
+			sourceTree = "<group>";
+		};
+		D8FDAF4E195C444000748A76 /* MMWordGrid */ = {
+			isa = PBXGroup;
+			children = (
+				D8FDAF55195C44F800748A76 /* MMWordGrid.h */,
+				D8FDAF56195C44F800748A76 /* MMWordGrid.m */,
+			);
+			path = MMWordGrid;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,9 +316,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8FDAF51195C445300748A76 /* MMCoordinate.m in Sources */,
 				D8FDAF1C195A671C00748A76 /* MMAppDelegate.m in Sources */,
-				D8FDAF22195A671C00748A76 /* MMViewController.m in Sources */,
+				D8FDAF22195A671C00748A76 /* MMMenuViewController.m in Sources */,
 				D8FDAF18195A671C00748A76 /* main.m in Sources */,
+				D8FDAF44195A674E00748A76 /* MMLineDrawingView.m in Sources */,
+				D8FDAF45195A674E00748A76 /* MMWordFindViewController.m in Sources */,
+				D8FDAF57195C44F800748A76 /* MMWordGrid.m in Sources */,
+				D8FDAF54195C449800748A76 /* MMPosition.m in Sources */,
+				D8FDAF48195BB43E00748A76 /* MMStripesBackgroundView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
