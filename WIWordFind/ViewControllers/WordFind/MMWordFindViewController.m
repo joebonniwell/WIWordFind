@@ -324,6 +324,7 @@
             CGPoint updatedStartingPoint = [self.view convertPoint:startingPoint toView:self.lineDrawingView];
             currentStartingCoordinate = [self coordinateNearestToPoint:updatedStartingPoint];
             NSLog(@"Starting tracking at coordinate: %d, %d", currentStartingCoordinate.row, currentStartingCoordinate.column);
+            [self updateActiveLineForTouchPoint:startingPoint];
         }
     }
 }
@@ -362,6 +363,7 @@
     
     
     NSString *selectedString = [self stringForCurrentSelection];
+    NSLog(@"Selected string: %@", selectedString);
     for (NSString *aWord in self.words)
     {
         // Could check for reversed string matching as well
@@ -402,9 +404,6 @@
     currentEndingCoordinate = nil;
     
     [self updateLetters];
-    
-    // Do stuff because its over
-    NSLog(@"Selected string: %@", [self stringForCurrentSelection]);
 }
 
 #pragma mark - Update Methods
