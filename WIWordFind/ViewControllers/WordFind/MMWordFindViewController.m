@@ -164,7 +164,8 @@
 {
     CGFloat heightOffset = (self.view.bounds.size.height - 320.0f) * 0.5f;
     [self setLineDrawingView:[[MMLineDrawingView alloc] initWithFrame:CGRectMake(0.0f, heightOffset, 320.0f, 320.0f)]];
-    [self.lineDrawingView setLineWidth:30.0f];
+    [self.lineDrawingView setTemporaryLineWidth:30.0f];
+    [self.lineDrawingView setPermanentLineWidth:18.0f];
     [self.lineDrawingView setBackgroundColor:[UIColor clearColor]];
     [self.view addSubview:self.lineDrawingView];
 }

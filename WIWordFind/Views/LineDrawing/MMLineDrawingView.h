@@ -20,7 +20,8 @@
 
 @interface MMLineDrawingView : UIView
 
-@property (nonatomic) CGFloat lineWidth;
+@property (nonatomic) CGFloat temporaryLineWidth;
+@property (nonatomic) CGFloat permanentLineWidth;
 
 - (NSArray*)permanentLines;
 - (void)addPermanentLine:(MMLine*)argLine;

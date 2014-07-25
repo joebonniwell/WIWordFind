@@ -42,7 +42,7 @@
 {    
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGContextSetLineWidth(context, self.lineWidth);
+    CGContextSetLineWidth(context, self.permanentLineWidth);
     CGContextSetLineCap(context, kCGLineCapRound);
     
     for (MMLine *aPermanentLine in permanentLines_mm)
@@ -53,6 +53,8 @@
         CGContextStrokePath(context);
     }
     
+    CGContextSetLineWidth(context, self.temporaryLineWidth);
+
     if (temporaryLine_mm)
     {
         CGContextSetStrokeColorWithColor(context, [temporaryLine_mm.color CGColor]);
