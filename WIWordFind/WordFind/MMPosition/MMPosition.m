@@ -64,4 +64,70 @@
     return (self.startCoordinate.column < self.endCoordinate.column) ? 1 : ((self.startCoordinate.column > self.endCoordinate.column) ? -1 : 0);
 }
 
+- (MMPositionDirection)positionDirection
+{
+    if (self.startCoordinate.row == self.endCoordinate.row)
+    {
+        return MMPositionDirectionHorizontal;
+    }
+    else if (self.startCoordinate.column == self.endCoordinate.column)
+    {
+        return MMPositionDirectionVertical;
+    }
+    return MMPositionDirectionDiagonal;
+}
+
+- (MMCoordinate*)randomCoodinate
+{
+    NSArray *allCoordinates = [self coordinates];
+    return [allCoordinates objectAtIndex:arc4random_uniform([allCoordinates count])];
+}
+
+- (NSArray*)coordinates
+{
+    NSMutableArray *allCoordinates = [NSMutableArray array];
+    
+    int currentRow = self.startCoordinate.row;
+    int currentColumn = self.startCoordinate.column;
+    
+    do {
+        MMCoordinate *aCoordinate = [MMCoordinate coordinateWithRow:currentRow column:currentColumn];
+        [allCoordinates addObject:aCoordinate];
+        currentRow += [self rowDirection];
+        currentColumn += [self columnDirection];
+    } while (currentRow != self.endCoordinate.row || currentColumn != self.endCoordinate.column);
+    
+    [allCoordinates addObject:self.endCoordinate];
+    
+    return allCoordinates;
+}
+
+#pragma mark - JSON
+
+- (NSArray*)JSONRepresentation
+{
+    return @[
+                @[[NSNumber numberWithInt:self.startCoordinate.row], [NSNumber numberWithInt:self.startCoordinate.column]],
+                @[[NSNumber numberWithInt:self.endCoordinate.row], [NSNumber numberWithInt:self.endCoordinate.column]]
+            ];
+}
+
++ (MMPosition*)positionWithJSONRepresentation:(NSArray*)argJSON
+{
+    if ([argJSON count] != 2)
+    {
+        return nil;
+    }
+    
+    int startCoordinateRow = [[[argJSON objectAtIndex:0] objectAtIndex:0] intValue];
+    int startCoordinateColumn = [[[argJSON objectAtIndex:0] objectAtIndex:1] intValue];
+    MMCoordinate *startCoordinate = [MMCoordinate coordinateWithRow:startCoordinateRow column:startCoordinateColumn];
+    
+    int endCoordinateRow = [[[argJSON objectAtIndex:1] objectAtIndex:0] intValue];
+    int endCoordinateColumn = [[[argJSON objectAtIndex:1] objectAtIndex:1] intValue];
+    MMCoordinate *endCoodinate = [MMCoordinate coordinateWithRow:endCoordinateRow column:endCoordinateColumn];
+    
+    return [MMPosition positionWithStartCoordinate:startCoordinate endCoordinate:endCoodinate];
+}
+
 @end

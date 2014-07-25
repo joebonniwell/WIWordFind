@@ -8,12 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+#define AvailablePositions @"AvailablePositions"
+#define HorizontalPositions @"HorizontalPositions"
+#define VerticalPositions @"VerticalPositions"
+#define DiagonalPositions @"DiagonalPositions"
+
 @class MMCoordinate;
 @class MMPosition;
+@class MMWordFindPuzzle;
 
 @interface MMWordGrid : NSObject
 
-- (id)initWithSize:(CGSize)argSize;
+- (id)initWithRows:(NSInteger)argRows columns:(NSInteger)argColumns;
 
 - (uint)rows;
 - (uint)columns;
@@ -28,5 +34,10 @@
 - (void)clearGrid;
 - (void)fillGridWithAlphabet;
 - (void)fillGridWithCharactersFromArray:(NSArray*)argArray;
+
+- (void)configureWithPuzzle:(MMWordFindPuzzle*)argPuzzle;
+
+- (NSDictionary*)availablePositionsForWord:(NSString*)argWord;
+- (NSArray*)availablePositionsForWordList:(NSArray*)argWordList;
 
 @end

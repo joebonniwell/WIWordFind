@@ -10,6 +10,13 @@
 
 @class MMCoordinate;
 
+typedef enum {
+    MMPositionDirectionNone = 0,
+    MMPositionDirectionHorizontal = 1,
+    MMPositionDirectionVertical = 2,
+    MMPositionDirectionDiagonal = 3
+    
+} MMPositionDirection;
 @interface MMPosition : NSObject <NSCopying>
 
 @property (nonatomic, strong) MMCoordinate *startCoordinate;
@@ -21,5 +28,10 @@
 - (uint)length;
 - (int)rowDirection;
 - (int)columnDirection;
+- (MMPositionDirection)positionDirection;
+- (MMCoordinate*)randomCoodinate;
+- (NSArray*)coordinates;
+- (NSArray*)JSONRepresentation;
++ (MMPosition*)positionWithJSONRepresentation:(NSArray*)argJSON;
 
 @end

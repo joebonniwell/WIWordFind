@@ -8,8 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+#define APP_DELEGATE (MMAppDelegate*)[[UIApplication sharedApplication] delegate]
+
 @interface MMAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+
+- (NSURL*)puzzleDirectoryURL;
+
+- (int)availableHints;
+- (void)decrementHints;
 
 @end

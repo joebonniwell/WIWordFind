@@ -9,6 +9,12 @@
 #import "MMMenuViewController.h"
 
 #import "MMStripesBackgroundView.h"
+#import "MMWordFindViewController.h"
+#import "MMWordFindPuzzle.h"
+
+#import <iAd/iAd.h>
+
+#define ShowPuzzleSelection @"ShowPuzzleSelection"
 
 @interface MMMenuViewController ()
 
@@ -47,9 +53,35 @@
     return YES;
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue*)argSegue sender:(id)argSender
+{
+//    if ([argSegue.identifier isEqualToString:@"ShowPuzzle"])
+//    {
+//        NSArray *words = @[
+//                           @"WISCONSIN",
+//                           @"CHEESE",
+//                           @"PACKERS",
+//                           @"BUCKS",
+//                           @"BREWERS",
+//                           @"BADGERS",
+//                           @"MILWAUKEE",
+//                           @"MADISON"
+//                           ];
+//        
+//        MMWordFindPuzzle *aPuzzle = [MMWordFindPuzzle randomPuzzleWithRows:12 columns:12 matchStrings:words];
+//        [aPuzzle setDisplayStrings:words];
+//        [(MMWordFindViewController*)argSegue.destinationViewController setCurrentPuzzle:aPuzzle];
+//    }
+}
+
 - (IBAction)playButtonTapped:(id)argSender
 {
-    [self performSegueWithIdentifier:@"ShowPuzzle" sender:nil];
+    [self performSegueWithIdentifier:ShowPuzzleSelection sender:nil];
+}
+
+- (void)showAd
+{
+    
 }
 
 @end

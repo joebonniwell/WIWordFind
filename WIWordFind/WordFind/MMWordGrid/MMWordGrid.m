@@ -9,6 +9,7 @@
 #import "MMWordGrid.h"
 #import "MMCoordinate.h"
 #import "MMPosition.h"
+#import "MMWordFindPuzzle.h"
 
 @interface MMWordGrid ()
 {
@@ -22,15 +23,110 @@
 
 @implementation MMWordGrid
 
-- (id)initWithSize:(CGSize)argSize
+- (id)initWithRows:(NSInteger)argRows columns:(NSInteger)argColumns
 {
     if ((self = [super init]))
     {
-        rows_mm = argSize.height;
-        columns_mm = argSize.width;
+        rows_mm = argRows;
+        columns_mm = argColumns;
         grid_mm = [[NSMutableDictionary alloc] initWithCapacity:(rows_mm * columns_mm)];
     }
     return self;
+}
+
+#pragma mark - Puzzle Generation Methods
+
+- (NSDictionary*)availablePositionsForWord:(NSString*)argWord
+{
+    NSMutableArray *availableHorizontalPositions = [NSMutableArray array];
+    NSMutableArray *availableVerticalPositions = [NSMutableArray array];
+    NSMutableArray *availableDiagonalPositions = [NSMutableArray array];
+    
+    for (int row = 0; row < [self rows]; row++)
+    {
+        for (int column = 0; column < [self columns]; column++)
+        {
+            // Starting coordinate...
+            MMCoordinate *startingCoordinate = [MMCoordinate coordinateWithRow:row column:column];
+            
+            NSArray *horizontalEndCoordinatesToCheck = @[
+                                                         [MMCoordinate coordinateWithRow:row column:(column + ((int)[argWord length] - 1))], // East
+                                                         [MMCoordinate coordinateWithRow:row column:(column - ((int)[argWord length] - 1))], // West
+                                                         ];
+            NSArray *verticalEndCoordinatesToCheck = @[
+                                                       [MMCoordinate coordinateWithRow:(row - ((int)[argWord length] - 1)) column:column], // North
+                                                       [MMCoordinate coordinateWithRow:(row + ((int)[argWord length] - 1)) column:column], // South
+                                                       ];
+            NSArray *diagonalEndCoordinatesToCheck = @[
+                                                       [MMCoordinate coordinateWithRow:(row - ((int)[argWord length] - 1)) column:(column + ((int)[argWord length] - 1))], // NE
+                                                       [MMCoordinate coordinateWithRow:(row + ((int)[argWord length] - 1)) column:(column + ((int)[argWord length] - 1))], // SE
+                                                       [MMCoordinate coordinateWithRow:(row + ((int)[argWord length] - 1)) column:(column - ((int)[argWord length] - 1))], // SW
+                                                       [MMCoordinate coordinateWithRow:(row - ((int)[argWord length] - 1)) column:(column - ((int)[argWord length] - 1))], // NW
+                                                       ];
+            for (MMCoordinate *anEndCoordinate in horizontalEndCoordinatesToCheck)
+            {
+                MMPosition *positionToCheck = [MMPosition positionWithStartCoordinate:startingCoordinate endCoordinate:anEndCoordinate];
+                if ([self isPosition:positionToCheck validForWord:argWord])
+                {
+                    [availableHorizontalPositions addObject:positionToCheck];
+                }
+            }
+            
+            for (MMCoordinate *anEndCoordinate in verticalEndCoordinatesToCheck)
+            {
+                MMPosition *positionToCheck = [MMPosition positionWithStartCoordinate:startingCoordinate endCoordinate:anEndCoordinate];
+                if ([self isPosition:positionToCheck validForWord:argWord])
+                {
+                    [availableVerticalPositions addObject:positionToCheck];
+                }
+            }
+            
+            for (MMCoordinate *anEndCoordinate in diagonalEndCoordinatesToCheck)
+            {
+                MMPosition *positionToCheck = [MMPosition positionWithStartCoordinate:startingCoordinate endCoordinate:anEndCoordinate];
+                if ([self isPosition:positionToCheck validForWord:argWord])
+                {
+                    [availableDiagonalPositions addObject:positionToCheck];
+                }
+            }
+        }
+    }
+    
+    return @{HorizontalPositions:availableHorizontalPositions, VerticalPositions:availableVerticalPositions, DiagonalPositions:availableDiagonalPositions};
+}
+
+- (NSArray*)availablePositionsForWordList:(NSArray*)argWordList
+{
+    NSMutableArray *allPositions = [NSMutableArray array];
+    
+    for (NSString *aWord in argWordList)
+    {
+        NSMutableDictionary *wordAndPositionsEntry = [NSMutableDictionary dictionaryWithObject:aWord forKey:@"Word"];
+        NSDictionary *availableWordPositions = [self availablePositionsForWord:aWord];
+        [wordAndPositionsEntry setObject:availableWordPositions forKey:AvailablePositions];
+        [allPositions addObject:wordAndPositionsEntry];
+    }
+    
+    [allPositions sortUsingComparator:^NSComparisonResult(id object1, id object2)
+    {
+        NSDictionary *wordAndPositionEntry1 = (NSDictionary*)object1;
+        NSDictionary *wordAndPositionEntry2 = (NSDictionary*)object2;
+        
+        int availablePositions1 =   [[wordAndPositionEntry1 objectForKey:HorizontalPositions] count] +
+                                    [[wordAndPositionEntry1 objectForKey:VerticalPositions] count] +
+                                    [[wordAndPositionEntry1 objectForKey:DiagonalPositions] count];
+        
+        int availablePositions2 =   [[wordAndPositionEntry2 objectForKey:HorizontalPositions] count] +
+                                    [[wordAndPositionEntry2 objectForKey:VerticalPositions] count] +
+                                    [[wordAndPositionEntry2 objectForKey:DiagonalPositions] count];
+
+        if (availablePositions1 > availablePositions2)
+            return NSOrderedAscending;
+        else if (availablePositions1 < availablePositions2)
+            return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+    return allPositions;
 }
 
 #pragma mark - Word Grid Values
@@ -132,7 +228,7 @@
     }
 }
 
-#pragma mark - Full Word Grid Manipulation
+#pragma mark - Full WordGrid Manipulation
 
 - (void)clearGrid
 {
@@ -157,6 +253,21 @@
             {
                 [self setCharacter:[argArray objectAtIndex:arc4random_uniform([argArray count])] atCoordinate:coordinate];
             }
+        }
+    }
+}
+
+#pragma mark - Puzzle Configuration Methods
+
+- (void)configureWithPuzzle:(MMWordFindPuzzle*)argPuzzle
+{
+    for (int row = 0; row < self.rows; row++)
+    {
+        for (int column = 0; column < self.columns; column++)
+        {
+            MMCoordinate *coordinate = [MMCoordinate coordinateWithRow:row column:column];
+            NSString *character = [argPuzzle characterAtCoordinate:coordinate];
+            [self setCharacter:character atCoordinate:coordinate];
         }
     }
 }

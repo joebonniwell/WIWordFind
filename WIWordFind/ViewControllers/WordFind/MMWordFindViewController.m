@@ -14,9 +14,11 @@
 #import "MMCoordinate.h"
 #import "MMPosition.h"
 #import "MMWordGrid.h"
+#import "MMWordFindPuzzle.h"
 
-#define TOTAL_ROWS 12
-#define TOTAL_COLUMNS 12
+#import "MMAppDelegate.h"
+
+#define HintBlinkPeriod 0.6f
 
 @interface MMWordFindViewController () <UIAlertViewDelegate, ADBannerViewDelegate>
 {
@@ -34,11 +36,15 @@
     MMCoordinate *currentEndingCoordinate;
     
     NSMutableSet *permanentSelectionCoordinates_mm;
+    NSMutableSet *activeHintCoordinates_mm;
     
     UIColor *activeLineColor_mm;
     UIColor *permanentLineColor_mm;
     
     NSMutableArray *wordLabels_mm;
+    
+    BOOL hintIsOn_mm;
+    NSTimeInterval lastHintTimeStamp_mm;
 }
 
 @property (nonatomic, strong) MMLineDrawingView *lineDrawingView;
@@ -51,135 +57,42 @@
 
 @property (nonatomic, weak) IBOutlet ADBannerView *adBannerView;
 
+@property (nonatomic, strong) NSTimer *hintTimer;
+
 @end
 
 @implementation MMWordFindViewController
 
 // TODO: Add a more dynamic layout depending on screen size and orientation
 
-// TODO: Add a letter generation algorithm that attempts to avoid making words not in the list...
-
-- (NSMutableArray*)arrayByAddingObjectsFromArray:(NSMutableArray*)argArray toArraysInArray:(NSMutableArray*)argExistingArrays
-{
-    NSMutableArray *updatedArray = [NSMutableArray array];
-    for (NSArray *anExistingArray in argExistingArrays)
-    {
-        for (id anObjectToAdd in argArray)
-        {
-            NSMutableArray *anArray = [NSMutableArray arrayWithArray:anExistingArray];
-            [anArray addObject:anObjectToAdd];
-            [updatedArray addObject:anArray];
-        }
-    }
-    return updatedArray;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
     
-    [self.stripesBackgroundView setStripeAngle:(M_PI / 4.0f)];
-    [self.stripesBackgroundView setStripeColors:@[
-                                                  [UIColor colorWithRed:0.478f green:0.667f blue:0.745f alpha:1.0f],
-                                                  [UIColor colorWithRed:0.424f green:0.620f blue:0.702f alpha:1.0f]
-                                                  ]];
-    
-    [self.stripesBackgroundView setStripeWidth:40.0f];
-    
-    NSLog(@"%@", [[MMCoordinate coordinateWithRow:4 column:7] isEqual:[MMCoordinate coordinateWithRow:4 column:7]] ? @"OK" : @"Problem with equal");
-    NSLog(@"%@", [[MMCoordinate coordinateWithRow:4 column:7] isEqual:[MMCoordinate coordinateWithRow:4 column:9]] ? @"Problem with non equal" : @"OK");
-
-    [self setWords:@[
-                     @"WISCONSIN",
-                     @"CHEESE",
-                     @"PACKERS",
-                     @"BUCKS",
-                     @"BREWERS",
-                     @"BADGERS",
-                     @"MILWAUKEE",
-                     @"MADISON"
-                     ]];
-    [self setFoundWords:[NSMutableArray array]];
-     
     permanentLineColor_mm = [UIColor colorWithRed:0.0f green:0.75f blue:0.0f alpha:0.35f];
     activeLineColor_mm = [UIColor colorWithRed:0.0f green:1.0f blue:0.0f alpha:0.65f];
 
     permanentSelectionCoordinates_mm = [NSMutableSet set];
-     
+    activeHintCoordinates_mm = [NSMutableSet set];
+    [self setFoundWords:[NSMutableArray array]];
+    
     // Word Grid Generation
-    wordGrid = [[MMWordGrid alloc] initWithSize:CGSizeMake(TOTAL_ROWS, TOTAL_COLUMNS)];
-
-    [self generatePuzzleInWordGrid:wordGrid withWords:self.words];
-    [wordGrid fillGridWithAlphabet];
+    wordGrid = [[MMWordGrid alloc] initWithRows:self.currentPuzzle.rows columns:self.currentPuzzle.columns];
+    [wordGrid configureWithPuzzle:self.currentPuzzle];
+    [self setWords:self.currentPuzzle.matchStrings];
     
-    CGFloat heightOffset = (self.view.bounds.size.height - 320.0f) * 0.5f;
-    
-    UIView *puzzleBackingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, heightOffset, 320.0f, 320.0f)];
-    [puzzleBackingView setBackgroundColor:[UIColor colorWithWhite:1.0f alpha:0.6f]];
-    [self.view addSubview:puzzleBackingView];
-    [puzzleBackingView.layer setCornerRadius:10.0f];
-    [puzzleBackingView setClipsToBounds:YES];
-    // Then we should sort the words by the number of available positions
-    
-    // Need to take the dimensions of the puzzle and place the words into that grid...
-    
-    labelWidth = 320.0f / (1.0f * TOTAL_ROWS);
-    labelHeight = 320.0f / (1.0f * TOTAL_COLUMNS);
-    overallLetterRect = CGRectMake(0.0f, heightOffset, TOTAL_COLUMNS * labelWidth, TOTAL_ROWS * labelHeight);
-    
-    // Load labels and add to view
-    viewArray = [NSMutableArray array];
-    for (int row = 0; row < TOTAL_ROWS; row++)
-    {
-        NSMutableArray *aRowArray = [NSMutableArray array];
-        [viewArray addObject:aRowArray];
-        for (int column = 0; column < TOTAL_COLUMNS; column++)
-        {
-            UILabel *letterLabel = [[UILabel alloc] initWithFrame:CGRectMake((labelWidth * column), (labelHeight * row) + heightOffset, labelWidth, labelHeight)];
-            [letterLabel setTextAlignment:NSTextAlignmentCenter];
-            [self.view addSubview:letterLabel];
-            [aRowArray addObject:letterLabel];
-        }
-    }
+    [self configureStripeBackground];
+    [self configurePuzzleBackgroundView];
+    [self configurePuzzleLetterLabels];
+    [self configureLineDrawingView];
+    [self configureSelectionLabel];
+    [self configureDisplayStringLabels];
+    [self configureHintButton];
     
     [self updateGrid];
-    
-    [self setLineDrawingView:[[MMLineDrawingView alloc] initWithFrame:CGRectMake(0.0f, heightOffset, 320.0f, 320.0f)]];
-    [self.lineDrawingView setLineWidth:30.0f];
-    [self.lineDrawingView setBackgroundColor:[UIColor clearColor]];
-    [self.view addSubview:self.lineDrawingView];
-    
-    [self setSelectionLabel:[[UILabel alloc] initWithFrame:CGRectMake(0.0f, heightOffset - 30.0f, 320.0f, 30.0f)]];
-    [self.selectionLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.selectionLabel setFont:[UIFont boldSystemFontOfSize:24.0f]];
-    [self.view addSubview:self.selectionLabel];
-    
-    // View Generation
-    
-    CGFloat offset = 10.0f;
-    CGFloat width = 100.0f;
-    CGFloat height = 16.0f;
-    
-    wordLabels_mm = [NSMutableArray array];
-    for (int aWordLabel = 0; aWordLabel < [self.words count]; aWordLabel++)
-    {
-        // Layout some labels
-        UILabel *wordLabel = [[UILabel alloc] initWithFrame:CGRectMake(offset + (fmodf(aWordLabel, 3) * 100.0f), 0.5f * (self.view.bounds.size.height + self.view.bounds.size.width) + (floorf(aWordLabel / 3.0f) * 16.0f), width, height)];
-        [wordLabel setFont:[UIFont systemFontOfSize:12.0f]];
-        [wordLabel setTextAlignment:NSTextAlignmentCenter];
-        [self.view addSubview:wordLabel];
-        [wordLabel setText:[self.words objectAtIndex:aWordLabel]];
-        [wordLabels_mm addObject:wordLabel];
-    }
-    
     [self updateLetters];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    
+    [self setHintTimer:[NSTimer scheduledTimerWithTimeInterval:(0.5f * HintBlinkPeriod) target:self selector:@selector(updateHints) userInfo:nil repeats:YES]];
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -187,111 +100,214 @@
     return YES;
 }
 
-// Placement Algorithm
-
-// Place all remaining to be placed words in a mutable set
-
-// Loop through each word and calculate how many available positions it could fit based on the current configuration
-
-// Take the word with the least amount of available positions and randomly choose a position for it
-
-// Remove that word from the list, repeat the analysis and placement... if at any point we end up with 0 available positions:
-
-// Then we would need to start backing up and choosing different positions for words, which means we need some sort of tracking on which positions were tried...
-
-- (NSArray*)calculatePositionsForWordList:(NSArray*)argWordList inGrid:(MMWordGrid*)argGrid
+- (void)dealloc
 {
-    NSMutableArray *allPositions = [NSMutableArray array];
-    
-    for (NSString *aWord in argWordList)
-    {
-        NSMutableDictionary *wordAndPositionsEntry = [NSMutableDictionary dictionaryWithObject:aWord forKey:@"Word"];
-        NSMutableArray *availableWordPositions = [NSMutableArray array];
-        // Horizontal
-        for (int row = 0; row < [argGrid rows]; row++)
-        {
-            for (int column = 0; column < [argGrid columns]; column++)
-            {
-                // Starting coordinate...
-                MMCoordinate *startingCoordinate = [MMCoordinate coordinateWithRow:row column:column];
-                
-                NSArray *endCoordinatesToCheck = @[
-                                                    [MMCoordinate coordinateWithRow:row column:(column + ((int)[aWord length] - 1))], // East
-                                                    [MMCoordinate coordinateWithRow:row column:(column - ((int)[aWord length] - 1))], // West
-                                                    [MMCoordinate coordinateWithRow:(row - ((int)[aWord length] - 1)) column:column], // North
-                                                    [MMCoordinate coordinateWithRow:(row + ((int)[aWord length] - 1)) column:column], // South
-                                                    [MMCoordinate coordinateWithRow:(row - ((int)[aWord length] - 1)) column:(column + ((int)[aWord length] - 1))], // NE
-                                                    [MMCoordinate coordinateWithRow:(row + ((int)[aWord length] - 1)) column:(column + ((int)[aWord length] - 1))], // SE
-                                                    [MMCoordinate coordinateWithRow:(row + ((int)[aWord length] - 1)) column:(column - ((int)[aWord length] - 1))], // SW
-                                                    [MMCoordinate coordinateWithRow:(row - ((int)[aWord length] - 1)) column:(column - ((int)[aWord length] - 1))], // NW
-                                                   ];
-                for (MMCoordinate *anEndCoordinate in endCoordinatesToCheck)
-                {
-                    MMPosition *positionToCheck = [MMPosition positionWithStartCoordinate:startingCoordinate endCoordinate:anEndCoordinate];
-                    if ([argGrid isPosition:positionToCheck validForWord:aWord])
-                    {
-                        [availableWordPositions addObject:positionToCheck];
-                    }
-                }
-            }
-        }
-        [wordAndPositionsEntry setObject:availableWordPositions forKey:@"AvailablePositions"];
-        [allPositions addObject:wordAndPositionsEntry];
-    }
-    
-//    NSLog(@"Available positions: %@", allPositions);
-    
-    [allPositions sortUsingComparator:^NSComparisonResult(id object1, id object2)
-    {
-        if ([[(NSDictionary*)object1 objectForKey:@"AvailablePositions"] count] < [[(NSDictionary*)object1 objectForKey:@"AvailablePositions"] count])
-        {
-            return NSOrderedAscending;
-        }
-        else if ([[(NSDictionary*)object1 objectForKey:@"AvailablePositions"] count] > [[(NSDictionary*)object1 objectForKey:@"AvailablePositions"] count])
-        {
-            return NSOrderedDescending;
-        }
-        return NSOrderedSame;
-    }];
-    return allPositions;
+    [self.hintTimer invalidate];
 }
 
-- (void)updateGrid
+#pragma mark - View Configuration Methods
+
+- (void)configureStripeBackground
 {
-    for (int row = 0; row < TOTAL_ROWS; row++)
+    [self.stripesBackgroundView setStripeAngle:(M_PI / 4.0f)];
+    [self.stripesBackgroundView setStripeColors:@[
+                                                  [UIColor colorWithRed:0.478f green:0.667f blue:0.745f alpha:1.0f],
+                                                  [UIColor colorWithRed:0.424f green:0.620f blue:0.702f alpha:1.0f]
+                                                  ]];
+    
+    [self.stripesBackgroundView setStripeWidth:40.0f]; // Active stripe width and permanent stripe width
+}
+
+- (void)configurePuzzleBackgroundView
+{
+    CGFloat heightOffset = (self.view.bounds.size.height - 320.0f) * 0.5f;
+    UIView *puzzleBackingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, heightOffset, 320.0f, 320.0f)];
+    [puzzleBackingView setBackgroundColor:[UIColor colorWithWhite:1.0f alpha:0.6f]];
+    [self.view addSubview:puzzleBackingView];
+    [puzzleBackingView.layer setCornerRadius:10.0f];
+    [puzzleBackingView setClipsToBounds:YES];
+}
+
+- (void)configurePuzzleLetterLabels
+{
+    CGFloat heightOffset = (self.view.bounds.size.height - 320.0f) * 0.5f;
+    // Puzzle Letter Labels
+    labelWidth = 320.0f / (1.0f * self.currentPuzzle.rows);
+    labelHeight = 320.0f / (1.0f * self.currentPuzzle.columns);
+    overallLetterRect = CGRectMake(0.0f, heightOffset, self.currentPuzzle.columns * labelWidth, self.currentPuzzle.rows * labelHeight);
+    
+    viewArray = [NSMutableArray array];
+    for (int row = 0; row < self.currentPuzzle.rows; row++)
     {
-        for (int column = 0; column < TOTAL_COLUMNS; column++)
+        NSMutableArray *aRowArray = [NSMutableArray array];
+        [viewArray addObject:aRowArray];
+        for (int column = 0; column < self.currentPuzzle.columns; column++)
         {
-            MMCoordinate *coordinate = [MMCoordinate coordinateWithRow:row column:column];
-            UILabel *letterLabel = [[viewArray objectAtIndex:row] objectAtIndex:column];
-            
-            NSString *character = [wordGrid characterAtCoordinate:coordinate];
-            if (!character)
-                character = @" ";
-            [letterLabel setText:character];
+            UILabel *letterLabel = [[UILabel alloc] initWithFrame:CGRectMake((labelWidth * column), (labelHeight * row) + heightOffset, labelWidth, labelHeight)];
+            [letterLabel setTextAlignment:NSTextAlignmentCenter];
+            [self.view addSubview:letterLabel];
+            [aRowArray addObject:letterLabel];
         }
     }
+}
+
+- (void)configureSelectionLabel
+{
+    CGFloat heightOffset = (self.view.bounds.size.height - 320.0f) * 0.5f;
+    [self setSelectionLabel:[[UILabel alloc] initWithFrame:CGRectMake(0.0f, heightOffset - 30.0f, 320.0f, 30.0f)]];
+    [self.selectionLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.selectionLabel setFont:[UIFont boldSystemFontOfSize:24.0f]];
+    [self.view addSubview:self.selectionLabel];
+}
+
+- (void)configureLineDrawingView
+{
+    CGFloat heightOffset = (self.view.bounds.size.height - 320.0f) * 0.5f;
+    [self setLineDrawingView:[[MMLineDrawingView alloc] initWithFrame:CGRectMake(0.0f, heightOffset, 320.0f, 320.0f)]];
+    [self.lineDrawingView setLineWidth:30.0f];
+    [self.lineDrawingView setBackgroundColor:[UIColor clearColor]];
+    [self.view addSubview:self.lineDrawingView];
+}
+
+- (void)configureDisplayStringLabels
+{
+    CGFloat columns = 4.0f;
+    
+    // Display Label Generation
+    CGFloat offset = 10.0f;
+    CGFloat width = ((self.view.bounds.size.width - (2.0f * offset)) / columns);
+    CGFloat height = 16.0f;
+    
+    wordLabels_mm = [NSMutableArray array];
+    for (int aWordLabel = 0; aWordLabel < [self.words count]; aWordLabel++)
+    {
+        // Layout some labels
+        UILabel *wordLabel = [[UILabel alloc] initWithFrame:CGRectMake(offset + (fmodf(aWordLabel, columns) * width), 0.5f * (self.view.bounds.size.height + self.view.bounds.size.width) + (floorf(aWordLabel / columns) * 16.0f), width, height)];
+        [wordLabel setFont:[UIFont systemFontOfSize:12.0f]];
+        [wordLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.view addSubview:wordLabel];
+        [wordLabel setText:[self.words objectAtIndex:aWordLabel]];
+        [wordLabels_mm addObject:wordLabel];
+    }
+}
+
+- (void)configureHintButton
+{
+    UIButton *hintButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [hintButton setFrame:CGRectMake(0.0f, 40.0f, 100.0f, 40.0f)];
+    [hintButton setTitle:@"Hint" forState:UIControlStateNormal];
+    [hintButton addTarget:self action:@selector(hintButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:hintButton];
 }
 
 #pragma mark - Interaction Methods
 
+- (void)hintButtonTapped
+{
+    // Check for available hints // Where to store these?
+//    if ([APP_DELEGATE availableHints] == 0)
+//    {
+//        // Make offer to player to buy/earn more hints
+//        UIAlertView *buyMoreHintsAlertView = [[UIAlertView alloc] initWithTitle:@"Out of Hints" message:@"You are out of hints. Would you like to get more?" delegate:self cancelButtonTitle:@"No Thanks" otherButtonTitles:@"Yes Please", nil];
+//        // TODO: Set tag on buy more hints alert view
+//        [buyMoreHintsAlertView show];
+//        return;
+//    }
+    
+    NSMutableArray *remainingWords = [NSMutableArray arrayWithArray:[self.currentPuzzle matchStrings]];
+    [remainingWords removeObjectsInArray:[self foundWords]];
+    
+    MMCoordinate *hintCoordinate = nil;
+    while ([remainingWords count] > 0 && !hintCoordinate)
+    {
+        NSString *randomRemainingWord = [remainingWords objectAtIndex:arc4random_uniform([remainingWords count])];
+        
+        NSUInteger randomWordIndex = [[self.currentPuzzle matchStrings] indexOfObject:randomRemainingWord];
+        if (randomWordIndex == NSNotFound)
+        {
+            NSLog(@"Couldn't find random word: %@ in match strings: %@", randomRemainingWord, [self.currentPuzzle matchStrings]);
+            return;
+        }
+
+        MMPosition *randomWordPosition = [[self.currentPuzzle wordPostions] objectAtIndex:randomWordIndex];
+        NSMutableArray *coordinatesForRandomWord = [NSMutableArray arrayWithArray:[randomWordPosition coordinates]];
+        
+        for (MMCoordinate *anActiveHintCoordinate in activeHintCoordinates_mm)
+        {
+            [coordinatesForRandomWord removeObject:anActiveHintCoordinate];
+        }
+        
+        if ([coordinatesForRandomWord count])
+        {
+            // Choose a remaining random coordinate
+            hintCoordinate = [coordinatesForRandomWord objectAtIndex:arc4random_uniform([coordinatesForRandomWord count])];
+            NSLog(@"Hint for %@ at %@ is %@", randomRemainingWord, randomWordPosition, hintCoordinate);
+        }
+        else
+        {
+            // Ineligible word for hint...
+            [remainingWords removeObject:randomRemainingWord];
+        }
+    }
+
+    if (!hintCoordinate)
+    {
+        // TODO: Show an alert view explaining that there are no more hints available for this puzzle...
+        return;
+    }
+
+    [self showHintAtCoordinate:hintCoordinate];
+    [APP_DELEGATE decrementHints];
+}
+
 - (void)regenerate
 {
-    // Should clear selection indicator as well
-    [self.foundWords removeAllObjects];
-    [wordGrid clearGrid];
-    [self generatePuzzleInWordGrid:wordGrid withWords:self.words];
-    [wordGrid fillGridWithAlphabet];
-    [self updateGrid];
-    [self.lineDrawingView clearAllLines];
-    [permanentSelectionCoordinates_mm removeAllObjects];
-    [self updateLetters];
-    
-    for (UILabel *aWordLabel in wordLabels_mm)
+//    // Should clear selection indicator as well
+//    [self.foundWords removeAllObjects];
+//    [wordGrid clearGrid];
+//    [self.lineDrawingView clearAllLines];
+//    [permanentSelectionCoordinates_mm removeAllObjects];
+//
+//    MMWordFindPuzzle *aPuzzle = [MMWordFindPuzzle randomPuzzleWithRows:TOTAL_ROWS columns:TOTAL_COLUMNS matchStrings:self.words];
+//    [wordGrid configureWithPuzzle:aPuzzle];
+//    
+//    [self updateGrid];
+//    [self updateLetters];
+//    
+//    for (UILabel *aWordLabel in wordLabels_mm)
+//    {
+////        [aWordLabel setText:aWordLabel.attributedText.string];
+//        [aWordLabel setAttributedText:[[NSAttributedString alloc] initWithString:aWordLabel.attributedText.string]];
+//    }
+}
+
+#pragma mark - Hints
+
+- (void)showHintAtCoordinate:(MMCoordinate*)argHintCoordinate
+{
+    [activeHintCoordinates_mm addObject:argHintCoordinate];
+}
+
+- (void)updateHints
+{
+    NSTimeInterval currentTimeStamp = [[NSDate date] timeIntervalSinceReferenceDate];
+    if ((currentTimeStamp - lastHintTimeStamp_mm) >= HintBlinkPeriod)
     {
-//        [aWordLabel setText:aWordLabel.attributedText.string];
-        [aWordLabel setAttributedText:[[NSAttributedString alloc] initWithString:aWordLabel.attributedText.string]];
+        hintIsOn_mm = !hintIsOn_mm;
+        lastHintTimeStamp_mm = currentTimeStamp;
     }
+    
+    // Hints
+    NSArray *activeHintViews = [self viewsForActiveHints];
+    if (hintIsOn_mm)
+    {
+        [activeHintViews makeObjectsPerformSelector:@selector(setTextColor:) withObject:[UIColor blackColor]];
+    }
+    else
+    {
+        [activeHintViews makeObjectsPerformSelector:@selector(setTextColor:) withObject:[UIColor whiteColor]];
+    }
+    [activeHintViews makeObjectsPerformSelector:@selector(setNeedsDisplay)];
 }
 
 #pragma mark - Touch Handling
@@ -351,6 +367,7 @@
         if ([aWord isEqualToString:selectedString])
         {
             [permanentSelectionCoordinates_mm addObjectsFromArray:[self coordinatesForCurrentSelection]];
+            [activeHintCoordinates_mm minusSet:[NSSet setWithArray:[self coordinatesForCurrentSelection]]];
             [self.foundWords addObject:aWord];
             
             [self.lineDrawingView addPermanentLine:[MMLine lineFromPoint:[self centerPointForCoordinate:currentStartingCoordinate] toPoint:currentEndPoint withColor:permanentLineColor_mm]];
@@ -406,6 +423,7 @@
         [self.lineDrawingView setTemporaryLine:[MMLine lineFromPoint:startingPoint toPoint:currentEndPoint withColor:activeLineColor_mm]];
         
         [self updateLetters];
+        [self updateHints];
         
         [self.selectionLabel setText:[self stringForCurrentSelection]];
     }
@@ -431,38 +449,21 @@
     [activelySelectedViews makeObjectsPerformSelector:@selector(setTextColor:) withObject:[UIColor blackColor]];
 }
 
-#pragma mark - Generation Methods
-
-- (void)generatePuzzleInWordGrid:(MMWordGrid*)argWordGrid withWords:(NSArray*)argWords
+- (void)updateGrid
 {
-    NSMutableArray *wordsToPlace = [NSMutableArray arrayWithArray:argWords];
-    
-    NSDate *start = [NSDate date];
-    while ([wordsToPlace count])
+    for (int row = 0; row < self.currentPuzzle.rows; row++)
     {
-        NSArray *calculatedPositions = [self calculatePositionsForWordList:wordsToPlace inGrid:wordGrid];
-        
-        NSDictionary *wordToPlace = [calculatedPositions firstObject];
-        NSString *word = [wordToPlace objectForKey:@"Word"];
-        NSArray *availablePositionsForWord = [wordToPlace objectForKey:@"AvailablePositions"];
-        // Remove already attempted positions...
-        
-        if ([availablePositionsForWord count] == 0)
+        for (int column = 0; column < self.currentPuzzle.columns; column++)
         {
-            NSLog(@"Got to available positions for word = 0");
+            MMCoordinate *coordinate = [MMCoordinate coordinateWithRow:row column:column];
+            UILabel *letterLabel = [[viewArray objectAtIndex:row] objectAtIndex:column];
             
-            [wordGrid clearGrid];
-            [wordsToPlace removeAllObjects];
-            [wordsToPlace addObjectsFromArray:argWords];
-            continue;
+            NSString *character = [wordGrid characterAtCoordinate:coordinate];
+            if (!character)
+                character = @" ";
+            [letterLabel setText:character];
         }
-        MMPosition *randomAvailablePosition = [availablePositionsForWord objectAtIndex:arc4random_uniform((int)[availablePositionsForWord count])];
-        [wordGrid setString:word atPosition:randomAvailablePosition];
-        [wordsToPlace removeObject:word];
-        
-//        NSLog(@"Placed word: %@ at %@, %d words remaining", word, randomAvailablePosition, [wordsToPlace count]);
     }
-    NSLog(@"Calculation time: %f", [[NSDate date] timeIntervalSinceDate:start]);
 }
 
 #pragma mark - Calculation Methods
@@ -516,11 +517,6 @@
     return CGPointMake(xValue, yValue);
 }
 
-// Get an array of the current coordinates in the selection
-
-// Labels from array of coorindates
-
-// Strings from array of coordinates
 
 - (NSArray*)coordinatesForCurrentSelection
 {
@@ -559,6 +555,16 @@
     for (MMCoordinate *aSelectedCoordinate in permanentSelectionCoordinates_mm)
     {
         [views addObject:[[viewArray objectAtIndex:aSelectedCoordinate.row] objectAtIndex:aSelectedCoordinate.column]];
+    }
+    return views;
+}
+
+- (NSArray*)viewsForActiveHints
+{
+    NSMutableArray *views = [NSMutableArray array];
+    for (MMCoordinate *anActiveHintCoordinate in activeHintCoordinates_mm)
+    {
+        [views addObject:[[viewArray objectAtIndex:anActiveHintCoordinate.row] objectAtIndex:anActiveHintCoordinate.column]];
     }
     return views;
 }

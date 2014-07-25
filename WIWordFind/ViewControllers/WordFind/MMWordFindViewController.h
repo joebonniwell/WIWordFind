@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class MMWordFindPuzzle;
+
 @interface MMWordFindViewController : UIViewController
+
+@property (nonatomic, strong) MMWordFindPuzzle *currentPuzzle;
 
 @end
