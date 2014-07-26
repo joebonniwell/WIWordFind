@@ -88,6 +88,7 @@
     [self configureSelectionLabel];
     [self configureDisplayStringLabels];
     [self configureHintButton];
+    [self configureMenuButton];
     
     [self updateGrid];
     [self updateLetters];
@@ -195,13 +196,30 @@
 - (void)configureHintButton
 {
     UIButton *hintButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [hintButton setFrame:CGRectMake(0.0f, 40.0f, 100.0f, 40.0f)];
+    [hintButton setFrame:CGRectMake((self.view.bounds.size.width - 60.0f), 40.0f, 60.0f, 40.0f)];
     [hintButton setTitle:@"Hint" forState:UIControlStateNormal];
+    [hintButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [hintButton addTarget:self action:@selector(hintButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:hintButton];
 }
 
+- (void)configureMenuButton
+{
+    UIButton *menuButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [menuButton setFrame:CGRectMake(0.0f, 40.0f, 60.0f, 40.0f)];
+    [menuButton setTitle:@"Menu" forState:UIControlStateNormal];
+    [menuButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+    [menuButton addTarget:self action:@selector(menuButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:menuButton];
+}
+
 #pragma mark - Interaction Methods
+
+- (void)menuButtonTapped
+{
+    // Take it to the menu and/or pop up confirmation?
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (void)hintButtonTapped
 {
@@ -366,6 +384,7 @@
     NSLog(@"Selected string: %@", selectedString);
     for (NSString *aWord in self.words)
     {
+#warning Currently allows duplicate selection, see both "Mac" options on right-most column of current puzzle... probably shouldn't allow this
         // Could check for reversed string matching as well
         if ([aWord isEqualToString:selectedString])
         {
