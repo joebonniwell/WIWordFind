@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		D803C9221981F0F2004FEBAB /* Ocean's 11.mmpuzzle in Resources */ = {isa = PBXBuildFile; fileRef = D803C9211981F0F2004FEBAB /* Ocean's 11.mmpuzzle */; };
+		D803C926198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D803C925198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.m */; };
+		D8AECE66198914240002A35F /* MMFauxWordFindView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8AECE65198914240002A35F /* MMFauxWordFindView.m */; };
 		D8FDAF0C195A671C00748A76 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF0B195A671C00748A76 /* Foundation.framework */; };
 		D8FDAF0E195A671C00748A76 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF0D195A671C00748A76 /* CoreGraphics.framework */; };
 		D8FDAF10195A671C00748A76 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FDAF0F195A671C00748A76 /* UIKit.framework */; };
@@ -45,6 +47,10 @@
 
 /* Begin PBXFileReference section */
 		D803C9211981F0F2004FEBAB /* Ocean's 11.mmpuzzle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Ocean's 11.mmpuzzle"; sourceTree = "<group>"; };
+		D803C924198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPuzzleSelectionTableViewCell.h; sourceTree = "<group>"; };
+		D803C925198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPuzzleSelectionTableViewCell.m; sourceTree = "<group>"; };
+		D8AECE64198914240002A35F /* MMFauxWordFindView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMFauxWordFindView.h; sourceTree = "<group>"; };
+		D8AECE65198914240002A35F /* MMFauxWordFindView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMFauxWordFindView.m; sourceTree = "<group>"; };
 		D8FDAF08195A671C00748A76 /* WIWordFind.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WIWordFind.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8FDAF0B195A671C00748A76 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D8FDAF0D195A671C00748A76 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -114,6 +120,24 @@
 				D803C9211981F0F2004FEBAB /* Ocean's 11.mmpuzzle */,
 			);
 			path = DefaultPuzzles;
+			sourceTree = "<group>";
+		};
+		D803C923198553C0004FEBAB /* MMPuzzleSelectionTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				D803C924198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.h */,
+				D803C925198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.m */,
+			);
+			path = MMPuzzleSelectionTableViewCell;
+			sourceTree = "<group>";
+		};
+		D8AECE63198914120002A35F /* MMFauxWordFindView */ = {
+			isa = PBXGroup;
+			children = (
+				D8AECE64198914240002A35F /* MMFauxWordFindView.h */,
+				D8AECE65198914240002A35F /* MMFauxWordFindView.m */,
+			);
+			path = MMFauxWordFindView;
 			sourceTree = "<group>";
 		};
 		D8FDAEFF195A671C00748A76 = {
@@ -270,6 +294,8 @@
 		D8FDAF671966478B00748A76 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D8AECE63198914120002A35F /* MMFauxWordFindView */,
+				D803C923198553C0004FEBAB /* MMPuzzleSelectionTableViewCell */,
 				D8FDAF681966478B00748A76 /* LineDrawing */,
 				D8FDAF6B1966478B00748A76 /* StripesBackground */,
 			);
@@ -406,8 +432,10 @@
 				D8FDAF1C195A671C00748A76 /* MMAppDelegate.m in Sources */,
 				D8FDAF5B19607DE000748A76 /* MMWordFindPuzzle.m in Sources */,
 				D8FDAF711966478B00748A76 /* MMStripesBackgroundView.m in Sources */,
+				D803C926198553D8004FEBAB /* MMPuzzleSelectionTableViewCell.m in Sources */,
 				D8FDAF6F1966478B00748A76 /* MMWordFindViewController.m in Sources */,
 				D8FDAF18195A671C00748A76 /* main.m in Sources */,
+				D8AECE66198914240002A35F /* MMFauxWordFindView.m in Sources */,
 				D8FDAF751971ED9300748A76 /* MMPuzzleSelectionViewController.m in Sources */,
 				D8FDAF57195C44F800748A76 /* MMWordGrid.m in Sources */,
 				D8FDAF6E1966478B00748A76 /* MMMenuViewController.m in Sources */,
